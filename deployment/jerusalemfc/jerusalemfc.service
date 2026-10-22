@@ -1,0 +1,24 @@
+[Unit]
+Description=Site Jerusalem FC
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=jerusalemfc
+Group=jerusalemfc
+WorkingDirectory=/var/www/jerusalemfc
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--no-deprecation
+EnvironmentFile=/var/www/jerusalemfc/.env
+ExecStart=/usr/bin/node /var/www/jerusalemfc/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3100
+Restart=on-failure
+RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

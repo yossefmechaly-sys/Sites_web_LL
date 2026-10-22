@@ -1,0 +1,36 @@
+# Runtime secrets and private keys
+.env
+.env.*
+!.env.example
+!*.env.example
+*.pem
+*.ppk
+*.key
+admin-initial.txt
+admin-email
+.aws/
+.ssh/
+
+# Installed dependencies and generated build/cache files
+node_modules/
+.next/
+.cache/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log
+
+# Databases and server backups
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sql
+*.sql.gz
+*.tar
+*.tar.gz
+*.tgz
+backups/
+.DS_Store

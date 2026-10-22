@@ -1,0 +1,9 @@
+[Unit]
+Description=Sauvegarde SQLite et medias Jerusalem FC
+
+[Service]
+Type=oneshot
+User=jerusalemfc
+Group=jerusalemfc
+UMask=0077
+ExecStart=/usr/bin/bash /var/www/jerusalemfc/deploy/sauvegarde.sh

@@ -1,0 +1,228 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  laurent-levy.com — site statique : bucket S3 privé + CloudFront (OAC), HTTPS,
+  en-têtes de sécurité, redirections, page 404. À déployer dans us-east-1
+  (obligatoire pour la CloudFront Function et le certificat ACM).
+
+Parameters:
+  CertificateArn:
+    Type: String
+    Description: ARN du certificat ACM (us-east-1) couvrant laurent-levy.com et www.laurent-levy.com
+  BucketName:
+    Type: String
+    Default: laurent-levy-site
+  ContactToEmail:
+    Type: String
+    Default: contact@laurent-levy.com
+    Description: Destinataire des messages du formulaire
+  ContactFromEmail:
+    Type: String
+    Default: formulaire@laurent-levy.com
+    Description: Expéditeur (domaine laurent-levy.com vérifié dans Amazon SES, même région que la pile)
+  OriginSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 24
+    Description: Secret partagé CloudFront -> Lambda (ex. openssl rand -hex 24) ; bloque les appels directs à la fonction
+
+Resources:
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      VersioningConfiguration: { Status: Enabled }
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${BucketName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+          - Sid: AllowListForProper404
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:ListBucket
+            Resource: !GetAtt SiteBucket.Arn
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+
+  RouterFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: laurent-levy-router
+      AutoPublish: true
+      FunctionConfig: { Comment: 'Redirections, langue, index.html', Runtime: cloudfront-js-2.0 }
+      # Code provisoire : remplacé par deploy/cloudfront-function.js à chaque deploy.sh
+      FunctionCode: |
+        function handler(event) { return event.request; }
+
+  # --- Formulaire de contact : Lambda + SES -------------------------------------
+  ContactRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement: [{ Effect: Allow, Principal: { Service: lambda.amazonaws.com }, Action: sts:AssumeRole }]
+      ManagedPolicyArns: [arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole]
+      Policies:
+        - PolicyName: send-contact-email
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: ses:SendEmail
+                Resource: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*'
+                Condition:
+                  StringEquals: { ses:FromAddress: !Ref ContactFromEmail }
+
+  ContactFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: laurent-levy-contact
+      Runtime: nodejs22.x
+      Architectures: [arm64]
+      Handler: index.handler
+      MemorySize: 256
+      Timeout: 10
+      Role: !GetAtt ContactRole.Arn
+      Environment:
+        Variables:
+          TO_EMAIL: !Ref ContactToEmail
+          FROM_EMAIL: !Ref ContactFromEmail
+          ORIGIN_SECRET: !Ref OriginSecret
+      # Code provisoire : remplacé par deploy/lambda/contact/index.mjs à chaque deploy.sh
+      Code:
+        ZipFile: |
+          exports.handler = async () => ({ statusCode: 503, body: '' });
+
+  ContactLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/laurent-levy-contact
+      RetentionInDays: 30
+
+  ContactUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref ContactFunction
+      AuthType: NONE
+
+  ContactUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ContactFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  SecurityHeaders:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: laurent-levy-security
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            Override: true
+            ContentSecurityPolicy: >-
+              default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;
+              font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none';
+              base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+          StrictTransportSecurity:
+            Override: true
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Preload: true
+          ContentTypeOptions: { Override: true }
+          FrameOptions: { Override: true, FrameOption: DENY }
+          ReferrerPolicy: { Override: true, ReferrerPolicy: strict-origin-when-cross-origin }
+        CustomHeadersConfig:
+          Items:
+            - { Header: Permissions-Policy, Override: true, Value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()' }
+            - { Header: Cross-Origin-Opener-Policy, Override: true, Value: same-origin }
+            - { Header: Cross-Origin-Resource-Policy, Override: true, Value: same-origin }
+        RemoveHeadersConfig:
+          Items: [{ Header: Server }]
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Aliases: [www.laurent-levy.com, laurent-levy.com]
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        DefaultRootObject: ''
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        Origins:
+          - Id: s3
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig: { OriginAccessIdentity: '' }
+          - Id: contact
+            DomainName: !Select [2, !Split ['/', !GetAtt ContactUrl.FunctionUrl]]
+            CustomOriginConfig: { OriginProtocolPolicy: https-only, OriginSSLProtocols: [TLSv1.2] }
+            OriginCustomHeaders:
+              - { HeaderName: x-origin-secret, HeaderValue: !Ref OriginSecret }
+        CacheBehaviors:
+          - PathPattern: /api/*
+            TargetOriginId: contact
+            ViewerProtocolPolicy: https-only
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+            CachedMethods: [GET, HEAD]
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # Managed-AllViewerExceptHostHeader
+            ResponseHeadersPolicyId: !Ref SecurityHeaders
+        DefaultCacheBehavior:
+          TargetOriginId: s3
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+          ResponseHeadersPolicyId: !Ref SecurityHeaders
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt RouterFunction.FunctionMetadata.FunctionARN
+        CustomErrorResponses:
+          - { ErrorCode: 403, ResponseCode: 404, ResponsePagePath: /404.html, ErrorCachingMinTTL: 60 }
+          - { ErrorCode: 404, ResponseCode: 404, ResponsePagePath: /404.html, ErrorCachingMinTTL: 60 }
+
+Outputs:
+  DistributionId:
+    Value: !Ref Distribution
+  DistributionDomain:
+    Description: Cible des enregistrements DNS (ALIAS/CNAME) pour laurent-levy.com et www
+    Value: !GetAtt Distribution.DomainName
+  Bucket:
+    Value: !Ref SiteBucket

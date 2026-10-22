@@ -1,0 +1,9 @@
+# Tâches planifiées du site Jerusalem FC — à ajouter avec « crontab -e » (utilisateur qui fait tourner le site).
+# Heures en heure d'Israël.
+CRON_TZ=Asia/Jerusalem
+
+# Import des matchs : toutes les 30 minutes de 10h à 23h30 (couvre les matchs du jour et les résultats du soir)
+*/30 10-23 * * * /var/www/jerusalemfc/deploy/import-matchs.sh >> /var/log/jerusalemfc/import.log 2>&1
+
+# Sauvegarde de la base et des médias, chaque nuit à 3h15
+15 3 * * * /var/www/jerusalemfc/deploy/sauvegarde.sh >> /var/log/jerusalemfc/sauvegarde.log 2>&1
