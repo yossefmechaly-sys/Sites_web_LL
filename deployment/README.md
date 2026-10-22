@@ -53,11 +53,34 @@ publics (42 contrôles), ainsi que la redirection HTTP vers HTTPS. Le certificat
 a été délivré par Certbot et son renouvellement est planifié. Aucun test de
 redémarrage de la machine n'est revendiqué.
 
+## Les Sept Clés pour Réussir
+
+- Projet : `/mnt/bigdata/les7cles`, avec un DocumentRoot par langue (`fr`, `en`,
+  `he`) et un hôte de développement correspondant.
+- Les modèles HTTP sont dans [`les7cles/`](les7cles/README.md). Certbot a créé
+  les trois vhosts SSL et les redirections vers HTTPS sur le serveur.
+- Un certificat SAN nommé `les7cles.tobedev.com` couvre les trois domaines ;
+  son renouvellement automatique est configuré.
+- Le drop-in `apache2.service.d/les7cles-storage.conf` exige le montage du disque.
+- `mod_substitute` adapte les trois origines définitives vers les domaines de
+  développement dans les réponses HTML/XML/texte. Les fichiers livrés restent
+  inchangés. Les lecteurs Calaméo et les scripts intégrés sont conservés.
+- `X-Robots-Tag: noindex, nofollow` demande la non-indexation des versions de
+  développement. `/contact.php` répond 503 et les fichiers PHP sont protégés :
+  les formulaires sont explicitement reportés aux domaines de production.
+
+Les 44 contrôles sur le serveur et 50 contrôles d'accès public ont réussi lors de
+la mise en ligne : pages FR/EN/HE, liens de langue, métadonnées, ressources,
+redirections et réponses d'erreur attendues. Les deux sites précédents ont aussi
+été vérifiés. Aucun test visuel automatisé, envoi d'e-mail, renouvellement simulé
+de ce nouveau certificat ni redémarrage de la machine n'est revendiqué.
+
 ## Avant une restauration
 
 Ne pas remplacer une base ou un dossier de médias par les fichiers du dépôt.
 Restaurer les données protégées séparément, préserver les secrets existants,
 vérifier les utilisateurs et les permissions, puis construire Jerusalem FC avec
-son URL publique avant de démarrer son service. Laurent Levy est déjà compilé.
+son URL publique avant de démarrer son service. Laurent Levy et Les Sept Clés
+sont déjà compilés.
 La configuration SSL réelle est gérée sur le serveur par Certbot ; les modèles
 HTTP ici ne remplacent pas une configuration TLS active.

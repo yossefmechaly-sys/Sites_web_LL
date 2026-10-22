@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://les7cles.com/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://les7cles.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thesevenkeystosucceed.com/"/>
+    <xhtml:link rel="alternate" hreflang="he" href="https://xn-----xldnbaepd2cbs3c5a9azbtec.co.il/"/>
+  </url>
+  <url>
+    <loc>https://les7cles.com/livre/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://les7cles.com/livre/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thesevenkeystosucceed.com/livre/"/>
+    <xhtml:link rel="alternate" hreflang="he" href="https://xn-----xldnbaepd2cbs3c5a9azbtec.co.il/livre/"/>
+  </url>
+  <url>
+    <loc>https://les7cles.com/mentions-legales/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://les7cles.com/mentions-legales/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thesevenkeystosucceed.com/legal-notice/"/>
+    <xhtml:link rel="alternate" hreflang="he" href="https://xn-----xldnbaepd2cbs3c5a9azbtec.co.il/legal/"/>
+  </url>
+</urlset>

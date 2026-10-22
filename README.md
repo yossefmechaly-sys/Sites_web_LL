@@ -1,12 +1,15 @@
 # Sites web Laurent Levy
 
-Sources livrées et configurations de déploiement des deux sites hébergés sur le
+Sources livrées et configurations de déploiement des sites hébergés sur le
 serveur Ubuntu AWS `34.254.255.211`.
 
 | Site | Dossier Git | Dossier sur le volume AWS |
 | --- | --- | --- |
 | [Jerusalem FC](https://jerusalemfc.tobedev.com) | `jerusalemfc/` | `/mnt/bigdata/jerusalemfc` |
 | [Laurent Levy](https://laurent-levy.tobedev.com) | `laurentlevy/` | `/mnt/bigdata/laurentlevy` |
+| [Les Sept Clés — français](https://les7cles.tobedev.com) | `les7cles/fr/` | `/mnt/bigdata/les7cles/fr` |
+| [Les Sept Clés — anglais](https://thesevenkeystosucceed.tobedev.com) | `les7cles/en/` | `/mnt/bigdata/les7cles/en` |
+| [Les Sept Clés — hébreu](https://xn-----xldnbaepd2cbs3c5a9azbtec.tobedev.com) | `les7cles/he/` | `/mnt/bigdata/les7cles/he` |
 
 ## Jerusalem FC
 
@@ -36,6 +39,22 @@ pas l'architecture actuellement déployée** sur ce serveur Ubuntu.
 L'archive ne fournit pas le projet Astro source ayant généré les pages ; les fichiers
 HTML/CSS/JS compilés livrés sont ceux versionnés ici.
 
+## Les Sept Clés pour Réussir
+
+Trois sites statiques déjà compilés, avec une racine Apache par langue. Les
+269 fichiers de la livraison sont conservés dans `les7cles/`, y compris les
+images, polices, scripts, `.htaccess`, `contact.php` et documents d'origine.
+Le projet Astro source mentionné dans ces documents n'était pas joint à l'archive.
+Aucune installation npm ni compilation n'est nécessaire pour servir ces fichiers.
+
+Les adresses `tobedev.com` sont des domaines de développement. Apache adapte les
+URL définitives encore présentes dans la livraison pour que les sélecteurs de
+langue, métadonnées et sitemaps utilisent ces domaines de développement. Il
+envoie aussi `X-Robots-Tag: noindex, nofollow`. Les formulaires sont désactivés
+jusqu'au passage sur les domaines de production : les scripts PHP livrés
+contiennent un destinataire fictif et aucun service d'envoi n'a été configuré.
+Voir [`deployment/les7cles/README.md`](deployment/les7cles/README.md).
+
 ## Déploiement et données
 
 Les configurations correspondant à l'hébergement actuel sont dans
@@ -46,6 +65,6 @@ Les secrets `.env`, clés SSH/TLS, identifiants administrateur, bases SQLite,
 sauvegardes et dépendances installées sont exclus. Le push Git ne déploie pas
 automatiquement les sites et ne constitue pas une sauvegarde des données CMS.
 
-Ce premier import provient des archives fournies et des configurations préparées
-pendant la mise en ligne. Il ne prétend pas capturer d'éventuelles modifications
+Les imports proviennent des archives fournies et des configurations préparées
+pendant la mise en ligne. Ils ne prétendent pas capturer d'éventuelles modifications
 ultérieures effectuées directement sur le serveur.
