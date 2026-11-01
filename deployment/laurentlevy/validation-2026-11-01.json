@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-01",
+  "production_url": "https://laurent-levy.com/",
+  "document_root": "/mnt/bigdata/laurentlevy/site-prod",
+  "production_pages_verified": 41,
+  "production_checks_passed": 58,
+  "finalisation_checks_passed": 13,
+  "certificate_domains": [
+    "laurent-levy.com",
+    "www.laurent-levy.com"
+  ],
+  "certificate_expires": "2027-01-30",
+  "renewal_dry_run": "passed",
+  "services": {
+    "apache2": "active",
+    "php8.5-fpm": "active",
+    "certbot.timer": "active"
+  },
+  "php_preservation": "SHA256 unchanged across cutover",
+  "mail_configuration": "preserved outside Git; contents not read or exported",
+  "test_email_sent": false,
+  "public_development_redirect": "confirmed 301 to production with same path and query",
+  "public_production_probe": "Cloud proxy refused CONNECT; origin TLS/content verified by native server curl checks",
+  "live_code_import": "pending server export; current Git site folder is the October delivery"
+}

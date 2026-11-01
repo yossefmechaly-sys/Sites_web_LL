@@ -10,6 +10,17 @@ admin-initial.txt
 admin-email
 .aws/
 .ssh/
+.npmrc
+.netrc
+.git-credentials
+.htpasswd
+contact.ini
+smtp.ini
+credentials.json
+secrets.json
+*.p12
+*.pfx
+*.der
 
 # Installed dependencies and generated build/cache files
 node_modules/
@@ -34,3 +45,7 @@ test-results/
 *.tgz
 backups/
 .DS_Store
+
+# Temporary server exports used to import the live project
+export-laurentlevy-github-*/
+*.tar.gz.part-*

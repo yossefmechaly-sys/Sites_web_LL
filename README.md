@@ -6,7 +6,7 @@ serveur Ubuntu AWS `34.254.255.211`.
 | Site | Dossier Git | Dossier sur le volume AWS |
 | --- | --- | --- |
 | [Jerusalem FC](https://jerusalemfc.tobedev.com) | `jerusalemfc/` | `/mnt/bigdata/jerusalemfc` |
-| [Laurent Levy](https://laurent-levy.tobedev.com) | `laurentlevy/` | `/mnt/bigdata/laurentlevy` |
+| [Laurent Levy](https://laurent-levy.com) | `laurentlevy/` | `/mnt/bigdata/laurentlevy/site-prod` |
 | [Les Sept Clés — français](https://les7cles.tobedev.com) | `les7cles/fr/` | `/mnt/bigdata/les7cles/fr` |
 | [Les Sept Clés — anglais](https://thesevenkeystosucceed.tobedev.com) | `les7cles/en/` | `/mnt/bigdata/les7cles/en` |
 | [Les Sept Clés — hébreu](https://xn-----xldnbaepd2cbs3c5a9azbtec.tobedev.com) | `les7cles/he/` | `/mnt/bigdata/les7cles/he` |
@@ -28,16 +28,28 @@ Utiliser une base isolée pour les tests, jamais la base de production.
 
 ## Laurent Levy
 
-Site statique déjà compilé, en français, anglais et hébreu. Apache sert
-`laurentlevy/site/` ; aucune compilation ni installation npm n'est nécessaire.
-Le formulaire de contact est actuellement désactivé, par choix explicite :
-l'envoi de messages reste à configurer.
+Site en production sur `https://laurent-levy.com/`, en français, anglais et hébreu.
+Apache sert `/mnt/bigdata/laurentlevy/site-prod`. Le domaine `www` et les pages
+de l'ancien domaine `laurent-levy.tobedev.com` redirigent vers le domaine nu.
+Les chemins et paramètres sont conservés, y compris pour les adresses hébraïques.
+
+Le collègue a configuré le formulaire avec PHP 8.5-FPM : `/api/contact` utilise
+`api/contact.php`, avec les identifiants d'e-mail hors du site dans
+`/etc/laurent-levy/contact.ini`. Ces fichiers et paramètres ont été préservés
+lors de la bascule du 1 novembre 2026. Les identifiants ne doivent pas être
+versionnés. La configuration déployée est décrite dans
+[`deployment/laurentlevy/README.md`](deployment/laurentlevy/README.md).
+
+L'import initial dans `laurentlevy/site/` est la livraison compilée d'octobre.
+L'import des fichiers actualisés du serveur, notamment `site-prod/` et le PHP du
+collègue, nécessite l'export décrit dans ce même document. Ne pas restaurer
+l'ancienne livraison sur le serveur pour remplacer ces fichiers récents.
 
 Le paquet comprend aussi un exemple d'infrastructure S3/CloudFront et le code
 Lambda du formulaire. Ils sont conservés comme sources de livraison et **ne sont
 pas l'architecture actuellement déployée** sur ce serveur Ubuntu.
-L'archive ne fournit pas le projet Astro source ayant généré les pages ; les fichiers
-HTML/CSS/JS compilés livrés sont ceux versionnés ici.
+L'archive initiale ne fournit pas le projet Astro source ayant généré les pages ;
+ses fichiers HTML/CSS/JS compilés sont conservés comme livraison de référence.
 
 ## Les Sept Clés pour Réussir
 

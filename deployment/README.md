@@ -38,20 +38,30 @@ n'ont pas été activés.
 ## Laurent Levy
 
 - Projet : `/mnt/bigdata/laurentlevy`, propriétaire `ubuntu`, groupe `www-data`.
-- DocumentRoot : `/mnt/bigdata/laurentlevy/site` (dossiers 0750, fichiers 0640).
-- Apache utilise `laurentlevy.conf` et le vhost SSL créé par Certbot.
+- Production : `https://laurent-levy.com/`, DocumentRoot
+  `/mnt/bigdata/laurentlevy/site-prod` (dossiers 0750, fichiers 0640).
+- Apache utilise `laurentlevy-prod.conf`, `laurentlevy-prod-le-ssl.conf` et les
+  règles partagées `/etc/apache2/laurent-levy-rules.conf` dans le vhost SSL.
+- Le domaine `www` et les pages GET/HEAD du domaine de développement redirigent
+  en 301 vers la production, avec conservation du chemin et des paramètres.
+  Les anciennes API et les challenges ACME restent exclus de la redirection dev.
 - Le drop-in `apache2.service.d/laurentlevy-storage.conf` exige le montage du disque.
 - `mod_substitute` adapte dans les réponses HTML/XML/texte les URL publiques du
-  domaine original vers `https://laurent-levy.tobedev.com`, sans changer les
-  adresses email ni les octets des fichiers livrés.
-- `/api/contact` répond volontairement 503 : l'envoi du formulaire est reporté.
-  Aucun nouveau service Node, bucket S3, CloudFront ou Lambda n'a été créé.
+  domaine `www` et du domaine de dev vers `https://laurent-levy.com/`, sans
+  changer les adresses email ni les fichiers du site.
+- Le collègue a activé le formulaire PHP : `/api/contact` est réécrit vers
+  `/api/contact.php`, traité via `/run/php/php8.5-fpm.sock`. Le script charge les
+  paramètres privés de `/etc/laurent-levy/contact.ini`, exclus de Git. Le GET
+  renvoie 405 ; aucun e-mail n'a été envoyé par les contrôles de bascule.
+- La sélection de langue à la racine, les anciennes redirections WordPress, les
+  erreurs 410, les en-têtes de sécurité et le cache ont été conservés.
 
-Lors de la mise en ligne, les 33 pages, cinq actifs représentatifs, sitemap,
-robots, 404 et endpoint de formulaire désactivé ont passé les contrôles HTTP
-publics (42 contrôles), ainsi que la redirection HTTP vers HTTPS. Le certificat
-a été délivré par Certbot et son renouvellement est planifié. Aucun test de
-redémarrage de la machine n'est revendiqué.
+Le 1 novembre 2026, 41 pages et 58 contrôles de production ont été validés,
+puis 13 contrôles de finalisation. Le certificat SAN couvre le domaine nu et
+`www`, expire le 30 janvier 2027, et son renouvellement simulé a réussi.
+Apache, PHP8.5-FPM et certbot.timer sont actifs. Voir le
+[détail et les fichiers à récupérer](laurentlevy/README.md).
+Aucun test visuel automatisé ni redémarrage machine n'est revendiqué.
 
 ## Les Sept Clés pour Réussir
 
