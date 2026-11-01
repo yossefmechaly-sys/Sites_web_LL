@@ -21,5 +21,17 @@
   "test_email_sent": false,
   "public_development_redirect": "confirmed 301 to production with same path and query",
   "public_production_probe": "Cloud proxy refused CONNECT; origin TLS/content verified by native server curl checks",
-  "live_code_import": "pending server export; current Git site folder is the October delivery"
+  "live_code_import": "completed: server export imported with all manifest SHA256 values verified",
+  "server_export": {
+    "archive_sha256": "1468984b1db39ff6683990a8d871c74faf2b68552ab1e5cb67ca4b99490f89ed",
+    "parts": 7,
+    "manifest_files": 2668,
+    "included_manifest_file": true,
+    "distinct_content_blobs": 520,
+    "distinct_content_bytes": 23081240,
+    "php_dev_prod_identical": true,
+    "historical_copies_included": true,
+    "obsolete_live_asset_names_removed": 4,
+    "private_mail_ini_included": false
+  }
 }

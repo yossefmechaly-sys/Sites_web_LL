@@ -40,16 +40,18 @@ lors de la bascule du 1 novembre 2026. Les identifiants ne doivent pas être
 versionnés. La configuration déployée est décrite dans
 [`deployment/laurentlevy/README.md`](deployment/laurentlevy/README.md).
 
-L'import initial dans `laurentlevy/site/` est la livraison compilée d'octobre.
-L'import des fichiers actualisés du serveur, notamment `site-prod/` et le PHP du
-collègue, nécessite l'export décrit dans ce même document. Ne pas restaurer
-l'ancienne livraison sur le serveur pour remplacer ces fichiers récents.
+Les fichiers actuels de `laurentlevy/site/`, `laurentlevy/site-prod/` et les
+configurations Apache ont été importés depuis l'export du serveur du
+1 novembre 2026. Les 2 668 fichiers du manifeste ont été vérifiés par SHA256,
+y compris les scripts PHP du collègue. Le dépôt conserve aussi les copies
+historiques présentes dans cet export ; les dossiers `site-avant-*`,
+`backups-formulaire-*` et `vhost-avant-*` ne sont pas les versions actives.
 
 Le paquet comprend aussi un exemple d'infrastructure S3/CloudFront et le code
 Lambda du formulaire. Ils sont conservés comme sources de livraison et **ne sont
 pas l'architecture actuellement déployée** sur ce serveur Ubuntu.
-L'archive initiale ne fournit pas le projet Astro source ayant généré les pages ;
-ses fichiers HTML/CSS/JS compilés sont conservés comme livraison de référence.
+Les archives et l'export reçus contiennent les fichiers HTML/CSS/JS compilés et
+le PHP déployé ; le projet Astro source ayant généré ces pages n'était pas fourni.
 
 ## Les Sept Clés pour Réussir
 

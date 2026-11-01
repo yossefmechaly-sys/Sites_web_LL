@@ -18,13 +18,12 @@ pour préserver les intégrations et le renouvellement du certificat de dev.
 Le serveur utilise le volume ext4 monté dans `/mnt/bigdata` ; le drop-in Apache
 `laurentlevy-storage.conf` exprime cette dépendance.
 
-## Fichiers du serveur à versionner
+## Fichiers du serveur versionnés
 
-Les fichiers récents du collègue sont présents sur AWS, mais n'étaient pas dans
-l'archive initiale importée en octobre. Ils doivent être récupérés avec
-[`export-github.sh`](export-github.sh) avant de considérer le dépôt comme une
-copie du projet actuel. L'export comprend le projet dans `laurentlevy/` et les
-configurations Apache dans ce dossier de déploiement :
+Les sept parties de l'export du 1 novembre 2026 ont été réunies et les 2 668
+fichiers du manifeste ont été vérifiés par SHA256 avant import. Le projet actuel
+est dans `laurentlevy/`, notamment `site-prod/`, `site/` et leurs scripts PHP.
+Les configurations suivantes sont les fichiers réellement exportés du serveur :
 
 - `apache-http.conf` : vhost de dev HTTP ;
 - `apache-dev-https.conf` : vhost de dev HTTPS ;
@@ -33,17 +32,30 @@ configurations Apache dans ce dossier de déploiement :
 - `laurent-levy-rules.conf` : règles communes incluses dans le vhost SSL ;
 - `apache2.service.d/laurentlevy-storage.conf` : dépendance au montage.
 
-Les noms ci-dessus correspondent aux cibles de l'export. Les fichiers de site
-et configurations actuels doivent être importés avant de publier cette mise à
-jour complète. Les modèles d'octobre encore présents dans le dépôt sont
-historiques et ne doivent pas écraser le PHP et les fichiers récents du serveur.
+Le manifeste original est conservé dans
+[`export-manifest.json`](export-manifest.json). Les fichiers copiés sont identiques
+à ceux de l'export ; les quatre anciens noms d'actifs supprimés de `site/` ne
+font plus partie de la version actuelle et restent accessibles dans l'historique
+Git. Les deux scripts PHP actifs de dev et de production sont identiques.
 
-L'export exclut les fichiers d'identifiants, `.env` privés, clés, bases, caches,
+L'export comprend aussi plusieurs copies historiques (`site-avant-*`,
+`backups-formulaire-*`, `vhost-avant-*`), conservées à leurs chemins pour ne pas
+perdre ces versions. Git déduplique les contenus identiques : les 153,6 Mo de
+l'archive ne représentent qu'environ 23,1 Mo de contenus distincts avant
+compression Git. Les fichiers actifs se trouvent uniquement dans `site/` et
+`site-prod/`. Les commentaires des configurations peuvent décrire leur état de
+modèle d'origine ; les directives exportées et ce document décrivent l'état réel.
+
+L'outil [`export-github.sh`](export-github.sh) exclut les fichiers d'identifiants, `.env` privés, clés, bases, caches,
 dépendances et archives de livraison/sauvegarde. Il ne lit pas le fichier
 `/etc/laurent-levy/contact.ini`. Les exemples `.env.example` et `.env.sample`
 peuvent être inclus ; leur contenu doit être vérifié avant le commit.
 Les archives volumineuses sont découpées pour le transfert, sans perte de
-fichiers sélectionnés. Le manifeste contient leurs chemins et SHA256.
+fichiers sélectionnés. Les archives de sauvegarde `.tgz` et la référence
+`lambda/contact.zip` figurent dans les exclusions du manifeste. La référence
+Lambda déjà versionnée lors du premier import a été conservée ; sa version
+actuelle sur le serveur n'est pas attestée par cet export. Aucun identifiant
+d'envoi, base de données ou clé privée n'est ajouté au dépôt.
 
 ## Comportement à conserver
 

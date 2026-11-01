@@ -60,7 +60,7 @@ Le 1 novembre 2026, 41 pages et 58 contrôles de production ont été validés,
 puis 13 contrôles de finalisation. Le certificat SAN couvre le domaine nu et
 `www`, expire le 30 janvier 2027, et son renouvellement simulé a réussi.
 Apache, PHP8.5-FPM et certbot.timer sont actifs. Voir le
-[détail et les fichiers à récupérer](laurentlevy/README.md).
+[détail et les fichiers exportés du serveur](laurentlevy/README.md).
 Aucun test visuel automatisé ni redémarrage machine n'est revendiqué.
 
 ## Les Sept Clés pour Réussir
